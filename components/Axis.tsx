@@ -72,7 +72,7 @@ export const YAxis = ({ domain = [0, 100], range = [10, 300] }) => {
             style={{
               fontSize: "10px",
               textAnchor: "middle",
-              transform: "translateX(10px)",
+              transform: "translateX(20px)",
             }}
           >
             {value}
