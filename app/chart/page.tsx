@@ -1,9 +1,9 @@
 "use client"
 import * as d3 from "d3"
 import { useMemo } from "react"
-import { useWindowSize } from "@uidotdev/usehooks";
+import { useWindowSize } from "@uidotdev/usehooks"
 import { useChartDimensions } from "./useChartDimensions"
-import { XAxis, YAxis } from "@/components/Axis"
+import { XAxis, YAxis, TimeAxis } from "@/components/Axis"
 
 export default function Page() {
   // const { data } = useChartData({ symbol: "SPY" })
@@ -15,7 +15,7 @@ export default function Page() {
     margin: { top: 40, right: 80, bottom: 80, left: 40 },
   }
   const { ref, dms } = useChartDimensions(chartSettings)
-  
+
   const xScale = useMemo(
     () =>
       d3
@@ -37,13 +37,14 @@ export default function Page() {
     <div ref={ref}>
       <svg width={dms.width} height={dms.height}>
         <g transform={`translate(${xScale.range()[1]}, 0)`}>
-          <YAxis
-            domain={yScale.domain()}
-            range={yScale.range()}
-          />
+          <YAxis domain={yScale.domain()} range={yScale.range()} />
         </g>
-        <g transform={`translate(0, ${yScale.range()[1]})`}>
+        {/* <g transform={`translate(0, ${yScale.range()[1]})`}>
           <XAxis domain={xScale.domain()} range={xScale.range()} />
+        </g> */}
+
+        <g transform={`translate(0, ${yScale.range()[1]})`}>
+          <TimeAxis range={xScale.range()} />
         </g>
       </svg>
     </div>

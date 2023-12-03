@@ -41,8 +41,6 @@ export const XAxis = ({ domain = [0, 100], range = [10, 700] }) => {
   )
 }
 
-
-
 export const YAxis = ({ domain = [0, 100], range = [10, 300] }) => {
   const ticks = useMemo(() => {
     const yScale = d3.scaleLinear().domain(domain).range(range)
@@ -76,6 +74,45 @@ export const YAxis = ({ domain = [0, 100], range = [10, 300] }) => {
             }}
           >
             {value}
+          </text>
+        </g>
+      ))}
+    </g>
+  )
+}
+
+export const TimeAxis = ({
+  domain = [new Date(2023, 0, 1), new Date(2023, 11, 31)],
+  range = [30, 300],
+}) => {
+  const ticks = useMemo(() => {
+    const tScale = d3.scaleTime().domain([domain[0], domain[1]]).range(range)
+
+    return tScale.ticks(10).map((value) => ({
+      value,
+      xOffset: tScale(value),
+    }))
+  }, [domain.join("-"), range.join("-")])
+
+  return (
+    <g>
+      <path
+        d={["M", range[0], 6, "v", -6, "H", range[1], "v", 6].join(" ")}
+        fill="none"
+        stroke="currentColor"
+      />
+      {ticks.map(({ value, xOffset }) => (
+        <g key={value.toUTCString()} transform={`translate(${xOffset}, 0)`}>
+          <line y2="6" stroke="currentColor" />
+          <text
+            key={value.toUTCString()}
+            style={{
+              fontSize: "10px",
+              textAnchor: "middle",
+              transform: "translateY(20px)",
+            }}
+          >
+            {d3.timeFormat("%m-%d")(value)}
           </text>
         </g>
       ))}
