@@ -36,13 +36,13 @@ export default function Page() {
   return (
     <div ref={ref}>
       <svg width={dms.width} height={dms.height}>
-        <g transform={`translate(${dms.marginLeft + dms.boundedWidth}, 0)`}>
+        <g transform={`translate(${xScale.range()[1]}, 0)`}>
           <YAxis
             domain={yScale.domain()}
             range={yScale.range()}
           />
         </g>
-        <g transform={`translate(0, ${dms.marginTop + dms.boundedHeight})`}>
+        <g transform={`translate(0, ${yScale.range()[1]})`}>
           <XAxis domain={xScale.domain()} range={xScale.range()} />
         </g>
       </svg>
