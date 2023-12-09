@@ -95,9 +95,9 @@ export const TimeAxis = ({
     const tScale = d3.scaleBand().domain(dates).range(range)
 
     return d3.timeMonday
-      .range(domain[0], domain[1], 5)
+      .range(domain[0], domain[1], 10)
       .map((value) => ({
-        value: d3.timeFormat("%y/%m/%d")(value),
+        value: d3.timeFormat("%b-%d")(value),
         xOffset: tScale(dateToStr(value)),
       }))
   }, [domain.join("-"), range.join("-")])
