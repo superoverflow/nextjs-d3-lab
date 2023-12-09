@@ -27,7 +27,7 @@ async function fetcher(url: string) {
 
 export function useChartData({ symbol }: { symbol: string }) {
   const { data, isLoading, error } = useSWR(
-    `http://localhost:3000/api/chart?symbol=${symbol}`,
+    `api/chart?symbol=${symbol}`,
     fetcher
   );
 
