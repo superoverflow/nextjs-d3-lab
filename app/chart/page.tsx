@@ -10,7 +10,7 @@ import type { OHLCData } from "./useChart"
 //TODO: move to useChartDimensions
 const dateToStr = d3.timeFormat("%y-%m-%d")
 
-const START_DATE = new Date(2022, 6, 1)
+const START_DATE = new Date(2022, 8, 1)
 const END_DATE = new Date()
 
 function OHLCBar({
@@ -22,25 +22,33 @@ function OHLCBar({
   x: d3.ScaleBand<string>
   y: d3.ScaleLinear<number, number, never>
 }) {
-  
-  const xOffset = x(dateToStr(data.closeDate))
+  const xOffset = x(dateToStr(data.closeDate)) || 0 
+  const strokeColor = data.open > data.close ? "green" : "red"
+  const y1 = data.open > data.close ? y(data.open) : y(data.close)
+  const y2 = data.open > data.close ? y(data.close) : y(data.open)
+  const height = y2 - y1
   return (
-    <path
-      d={`
-        M${xOffset},${y(data.low)}V${y(data.high)}
-        M${xOffset},${y(data.open)}h-4
-        M${xOffset},${y(data.close)}h4
-      `}
-      fill="none"
-      stroke="currentColor"
-    />
+    <g>
+      <path
+        d={`M${xOffset},${y(data.low)}V${y(data.high)}`}
+        fill="none"
+        stroke={strokeColor}
+      />
+      <rect
+        x={xOffset - x.bandwidth() / 2}
+        y={y1}
+        width={x.bandwidth()}
+        height={height}
+        fill={strokeColor}
+      />
+    </g>
   )
 }
 
 export default function Page() {
   const { data } = useChartData({ symbol: "SPY" })
   const { height, width } = useWindowSize()
-  
+
   const chartSettings = {
     width: width || 800,
     height: height || 600,
@@ -79,9 +87,9 @@ export default function Page() {
         <g transform={`translate(0, ${yScale.range()[0]})`}>
           <TimeAxis range={tScale.range()} domain={[START_DATE, END_DATE]} />
         </g>
-        {data?.map((d, i) => 
-          <OHLCBar key={i} data={d} x={tScale} y={yScale} />)
-        }
+        {data?.map((d, i) => (
+          <OHLCBar key={i} data={d} x={tScale} y={yScale} />
+        ))}
       </svg>
     </div>
   )
