@@ -10,6 +10,9 @@ import type { OHLCData } from "./useChart"
 //TODO: move to useChartDimensions
 const dateToStr = d3.timeFormat("%y-%m-%d")
 
+const START_DATE = new Date(2022, 6, 1)
+const END_DATE = new Date()
+
 function OHLCBar({
   data,
   x,
@@ -37,7 +40,7 @@ function OHLCBar({
 export default function Page() {
   const { data } = useChartData({ symbol: "SPY" })
   const { height, width } = useWindowSize()
-
+  
   const chartSettings = {
     width: width || 800,
     height: height || 600,
@@ -45,18 +48,9 @@ export default function Page() {
   }
   const { ref, dms } = useChartDimensions(chartSettings)
 
-  const xScale = useMemo(
-    () =>
-      d3
-        .scaleLinear()
-        .domain([0, 100])
-        .range([dms.marginLeft, dms.marginLeft + dms.boundedWidth]),
-    [dms.boundedWidth],
-  )
-
   const tScale = useMemo(() => {
     const dates = d3.timeDay
-      .range(new Date(2022, 6, 1), new Date(2023, 11, 31))
+      .range(START_DATE, END_DATE)
       .filter((d) => d.getDay() !== 0 && d.getDay() !== 6)
       .map((d) => dateToStr(d))
 
@@ -79,11 +73,11 @@ export default function Page() {
   return (
     <div ref={ref}>
       <svg width={dms.width} height={dms.height}>
-        <g transform={`translate(${xScale.range()[1]}, 0)`}>
+        <g transform={`translate(${tScale.range()[1]}, 0)`}>
           <YAxis domain={yScale.domain()} range={yScale.range()} />
         </g>
         <g transform={`translate(0, ${yScale.range()[0]})`}>
-          <TimeAxis range={tScale.range()} />
+          <TimeAxis range={tScale.range()} domain={[START_DATE, END_DATE]} />
         </g>
         {data?.map((d, i) => 
           <OHLCBar key={i} data={d} x={tScale} y={yScale} />)

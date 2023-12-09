@@ -45,9 +45,9 @@ export const YAxis = ({ domain = [0, 100], range = [10, 300] }) => {
   const ticks = useMemo(() => {
     const yScale = d3.scaleLinear().domain(domain).range(range)
 
-    const width = range[1] - range[0]
-    const pixelsPerTick = 30
-    const numberOfTicksTarget = Math.max(1, Math.floor(width / pixelsPerTick))
+    const height = range[0] - range[1]
+    const pixelsPerTick =50
+    const numberOfTicksTarget = Math.max(1, Math.floor(height / pixelsPerTick))
 
     return yScale.ticks(numberOfTicksTarget).map((value) => ({
       value,
@@ -97,7 +97,7 @@ export const TimeAxis = ({
     return d3.timeMonday
       .range(domain[0], domain[1], 5)
       .map((value) => ({
-        value: d3.timeFormat("%m/%d")(value),
+        value: d3.timeFormat("%y/%m/%d")(value),
         xOffset: tScale(dateToStr(value)),
       }))
   }, [domain.join("-"), range.join("-")])
