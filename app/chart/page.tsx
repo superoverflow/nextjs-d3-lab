@@ -3,10 +3,39 @@ import * as d3 from "d3"
 import { useMemo } from "react"
 import { useWindowSize } from "@uidotdev/usehooks"
 import { useChartDimensions } from "./useChartDimensions"
-import { XAxis, YAxis, TimeAxis } from "@/components/Axis"
+import { YAxis, TimeAxis } from "@/components/Axis"
+import { useChartData } from "./useChart"
+import type { OHLCData } from "./useChart"
+
+//TODO: move to useChartDimensions
+const dateToStr = d3.timeFormat("%y-%m-%d")
+
+function OHLCBar({
+  data,
+  x,
+  y,
+}: {
+  data: OHLCData
+  x: d3.ScaleBand<string>
+  y: d3.ScaleLinear<number, number, never>
+}) {
+  
+  const xOffset = x(dateToStr(data.closeDate))
+  return (
+    <path
+      d={`
+        M${xOffset},${y(data.low)}V${y(data.high)}
+        M${xOffset},${y(data.open)}h-4
+        M${xOffset},${y(data.close)}h4
+      `}
+      fill="none"
+      stroke="currentColor"
+    />
+  )
+}
 
 export default function Page() {
-  // const { data } = useChartData({ symbol: "SPY" })
+  const { data } = useChartData({ symbol: "SPY" })
   const { height, width } = useWindowSize()
 
   const chartSettings = {
@@ -24,13 +53,27 @@ export default function Page() {
         .range([dms.marginLeft, dms.marginLeft + dms.boundedWidth]),
     [dms.boundedWidth],
   )
+
+  const tScale = useMemo(() => {
+    const dates = d3.timeDay
+      .range(new Date(2022, 6, 1), new Date(2023, 11, 31))
+      .filter((d) => d.getDay() !== 0 && d.getDay() !== 6)
+      .map((d) => dateToStr(d))
+
+    return d3
+      .scaleBand()
+      .domain(dates)
+      .range([dms.marginLeft, dms.marginLeft + dms.boundedWidth])
+      .padding(0.2)
+  }, [data, dms.boundedWidth])
+
   const yScale = useMemo(
     () =>
       d3
         .scaleLinear()
-        .domain([100, 0])
-        .range([dms.marginTop, dms.marginTop + dms.boundedHeight]),
-    [dms.boundedHeight],
+        .domain([300, 480])
+        .range([dms.marginTop + dms.boundedHeight, dms.marginTop]),
+    [data, dms.boundedHeight],
   )
 
   return (
@@ -39,13 +82,12 @@ export default function Page() {
         <g transform={`translate(${xScale.range()[1]}, 0)`}>
           <YAxis domain={yScale.domain()} range={yScale.range()} />
         </g>
-        {/* <g transform={`translate(0, ${yScale.range()[1]})`}>
-          <XAxis domain={xScale.domain()} range={xScale.range()} />
-        </g> */}
-
-        <g transform={`translate(0, ${yScale.range()[1]})`}>
-          <TimeAxis range={xScale.range()} />
+        <g transform={`translate(0, ${yScale.range()[0]})`}>
+          <TimeAxis range={tScale.range()} />
         </g>
+        {data?.map((d, i) => 
+          <OHLCBar key={i} data={d} x={tScale} y={yScale} />)
+        }
       </svg>
     </div>
   )

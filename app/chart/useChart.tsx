@@ -2,19 +2,26 @@ import useSWR from "swr";
 import * as d3 from "d3";
 
 
-export type Data = {
-    Close: number;
-    Date: Date;
+export type OHLCData = {
+    open: number;
+    close: number;
+    high: number;
+    low: number;
+    closeDate: Date;
 }
 
 async function fetcher(url: string) {
   const tParser = d3.timeParse("%Y-%m-%d");
   const row = (d: any) => {
-    d.Close = +d.Close;
-    d.Date = tParser(d.Date);
-    return d;
+    return {
+      open: +d.Open,
+      close: +d.Close,
+      high: +d.High,
+      low: +d.Low,
+      closeDate: tParser(d.Date) || new Date(2999, 12, 31)
+    };
   };
-  const result = await d3.csv<Data>(url, row);
+  const result = await d3.csv<OHLCData>(url, row);
   return result;
 }
 

@@ -85,13 +85,21 @@ export const TimeAxis = ({
   domain = [new Date(2023, 0, 1), new Date(2023, 11, 31)],
   range = [30, 300],
 }) => {
+  const dateToStr = d3.timeFormat("%y-%m-%d")
   const ticks = useMemo(() => {
-    const tScale = d3.scaleTime().domain([domain[0], domain[1]]).range(range)
+    const dates = d3.timeDay
+      .range(domain[0], domain[1])
+      .filter((d) => d.getDay() !== 0 && d.getDay() !== 6)
+      .map((d) => dateToStr(d))
 
-    return tScale.ticks(10).map((value) => ({
-      value,
-      xOffset: tScale(value),
-    }))
+    const tScale = d3.scaleBand().domain(dates).range(range).padding(0.2)
+
+    return d3.timeMonday
+      .range(domain[0], domain[1], 5)
+      .map((value) => ({
+        value: d3.timeFormat("%m/%d")(value),
+        xOffset: tScale(dateToStr(value)),
+      }))
   }, [domain.join("-"), range.join("-")])
 
   return (
@@ -102,17 +110,17 @@ export const TimeAxis = ({
         stroke="currentColor"
       />
       {ticks.map(({ value, xOffset }) => (
-        <g key={value.toUTCString()} transform={`translate(${xOffset}, 0)`}>
+        <g key={value} transform={`translate(${xOffset}, 0)`}>
           <line y2="6" stroke="currentColor" />
           <text
-            key={value.toUTCString()}
+            key={value}
             style={{
               fontSize: "10px",
               textAnchor: "middle",
               transform: "translateY(20px)",
             }}
           >
-            {d3.timeFormat("%m-%d")(value)}
+            {value}
           </text>
         </g>
       ))}
