@@ -92,7 +92,7 @@ export const TimeAxis = ({
       .filter((d) => d.getDay() !== 0 && d.getDay() !== 6)
       .map((d) => dateToStr(d))
 
-    const tScale = d3.scaleBand().domain(dates).range(range)
+    const tScale = d3.scaleBand().domain(dates).range(range).paddingInner(0.2)
 
     return d3.timeMonday
       .range(domain[0], domain[1], 10)

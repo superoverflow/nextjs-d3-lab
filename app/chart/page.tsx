@@ -23,7 +23,7 @@ function OHLCBar({
   y: d3.ScaleLinear<number, number, never>
 }) {
   const xOffset = x(dateToStr(data.closeDate)) || 0 
-  const strokeColor = data.open > data.close ? "green" : "red"
+  const strokeColor = data.open < data.close ? "green" : "red"
   const y1 = data.open > data.close ? y(data.open) : y(data.close)
   const y2 = data.open > data.close ? y(data.close) : y(data.open)
   const height = y2 - y1
